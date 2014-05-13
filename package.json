@@ -1,0 +1,38 @@
+{
+  "name": "oaesh",
+  "description": "An interactive shell UI for the Apereo OAE backend (Hilary)",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mrvisser/oaesh",
+  "author": {
+    "name": "Branden Visser",
+    "email": "mrvisser@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mrvisser/oaesh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrvisser/oaesh/issues"
+  },
+  "bin": {
+    "oaesh": "./bin/oaesh.js"
+  },
+  "dependencies": {
+    "colors": "latest",
+    "corporal": "latest",
+    "oae-rest": "latest",
+    "read": "latest",
+    "sprintf-js": "latest",
+    "underscore": "latest",
+    "yargs": "latest"
+  },
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-mocha-test": "latest",
+    "grunt-release": "~0.7.0"
+  },
+  "engines": {
+    "node": ">=0.8"
+  }
+}
