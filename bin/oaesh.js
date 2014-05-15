@@ -58,6 +58,7 @@ var corporal = new Corporal({
         'global-anon': {
             'commands': [
                 'config-get',
+                'exec',
                 'login',
                 'me'
             ]
@@ -67,15 +68,19 @@ var corporal = new Corporal({
                 'config-clear',
                 'config-get',
                 'config-set',
+                'exec',
+                'login-as-user',
                 'login-to-tenant',
                 'logout',
                 'me',
+                'previews-reprocess',
                 'search-reindex-all'
             ]
         },
         'user-anon': {
             'commands': [
                 'config-get',
+                'exec',
                 'login',
                 'me',
                 'user-create'
@@ -86,6 +91,8 @@ var corporal = new Corporal({
                 'config-clear',
                 'config-get',
                 'config-set',
+                'exec',
+                'login-as-user',
                 'logout',
                 'me',
                 'user-create'
@@ -94,6 +101,7 @@ var corporal = new Corporal({
         'user-user': {
             'commands': [
                 'config-get',
+                'exec',
                 'logout',
                 'me'
             ]
