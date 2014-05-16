@@ -15,10 +15,13 @@ var ValidationError = require('../lib/errors/validation');
 var RestUtil = require('oae-rest/lib/util');
 
 var argv = yargs
-    .usage('Usage: oaesh [--url <target>] [--username <username>] [-- <command>]')
+    .usage('Usage: oaesh [--insecure] [--url <target>] [--username <username>] [-- <command>]')
 
     .alias('h', 'help')
     .describe('h', 'Show this help dialog')
+
+    .alias('i', 'insecure')
+    .describe('i', 'Allow insecure connections to the target environment, such as a QA environment that has a self-signed SSL certificate')
 
     .alias('U', 'url')
     .describe('U', 'The target URL to use (e.g., https://my.oae.com)')
@@ -114,7 +117,8 @@ var corporal = new Corporal({
             'help': {
                 'hide': ['clear', 'help', 'quit']
             }
-        }
+        },
+        'insecure': (argv.i)
     }
 });
 
