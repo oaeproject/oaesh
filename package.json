@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "grunt": "latest",
-    "grunt-mocha-test": "latest",
     "grunt-release": "~0.7.0"
   },
   "engines": {
