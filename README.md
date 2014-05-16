@@ -11,6 +11,8 @@ Install
 Starting a Prompt
 =================
 
+`oaesh`
+
 ```
 ~$ oaesh
 oaesh$ help
