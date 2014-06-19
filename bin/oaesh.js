@@ -29,6 +29,9 @@ var argv = yargs
     .alias('u', 'username')
     .describe('u', 'The username to use to authenticate. If this is specified, -U must be specified as well')
 
+    .alias('p', 'password')
+    .describe('p', 'The password to use to authenticate. If -u is specified without this parameter, a password prompt is used')
+
     .argv;
 
 if (argv.h) {
@@ -213,6 +216,11 @@ function _initialize(callback) {
             return callback();
         }
 
-        return corporal.exec('login', ['--username', argv.u], callback);
+        var loginArgs = ['--username', argv.u];
+        if (argv.p) {
+            loginArgs.push('--password', argv.p);
+        }
+
+        return corporal.exec('login', loginArgs, callback);
     });
 }
