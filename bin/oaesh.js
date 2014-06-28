@@ -49,7 +49,8 @@ var _initialized = false;
 // /dev/null the error event, we handle them individually in the commands
 RestUtil.on('error', function(err) {});
 
-
+// Add some underscore mixins that make life easier
+require('../lib/internal/underscoreMixins');
 
 ////////////////////
 // INITIALIZATION //
