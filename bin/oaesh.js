@@ -87,6 +87,7 @@ var corporal = new Corporal({
         'user-anon': {
             'commands': [
                 'config-get',
+                'content-get-members',
                 'exec',
                 'login',
                 'me',
@@ -98,6 +99,7 @@ var corporal = new Corporal({
                 'config-clear',
                 'config-get',
                 'config-set',
+                'content-get-members',
                 'exec',
                 'login-as-user',
                 'logout',
@@ -108,6 +110,7 @@ var corporal = new Corporal({
         'user-user': {
             'commands': [
                 'config-get',
+                'content-get-members',
                 'exec',
                 'logout',
                 'me'
