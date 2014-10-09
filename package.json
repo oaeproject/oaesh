@@ -25,7 +25,7 @@
     "read": "latest",
     "sprintf-js": "latest",
     "underscore": "latest",
-    "yargs": "latest"
+    "yargs": "1.0.15"
   },
   "devDependencies": {
     "grunt": "latest",
