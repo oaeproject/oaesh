@@ -1,7 +1,7 @@
 {
   "name": "oaesh",
   "description": "An interactive shell UI for the Apereo OAE backend (Hilary)",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/mrvisser/oaesh",
   "author": {
     "name": "Branden Visser",
