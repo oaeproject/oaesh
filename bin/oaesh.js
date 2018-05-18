@@ -150,6 +150,7 @@ corporal.onCommandError(ValidationError, function(err, session, next) {
 });
 
 corporal.onCommandError(HttpError, function(err, session, next) {
+
     console.error(util.format('HTTP Error (%s): '.red, err.code) + err.message);
 
     if (!_initialized) {
@@ -211,11 +212,12 @@ corporal.on('load', function() {
 ////////////////////////
 
 function _initialize(callback) {
+
     if (!argv.U) {
         return callback();
     }
 
-    corporal.exec('use', [argv.U], function() {
+    corporal.exec('use', [argv.U, argv['host-header'] ], function() {
         if (!argv.u) {
             return callback();
         }
@@ -224,7 +226,7 @@ function _initialize(callback) {
         if (argv.p) {
             loginArgs.push('--password', argv.p);
         }
-
+        
         return corporal.exec('login', loginArgs, callback);
     });
 }
