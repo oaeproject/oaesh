@@ -1,230 +1,203 @@
 #!/usr/bin/env node
+/* eslint-disable camelcase, no-use-extend-native/no-use-extend-native */
 
-var _ = require('underscore');
-var colors = require('colors');
-var Corporal = require('corporal');
-var path = require('path');
-var sprintf = require('sprintf-js');
-var util = require('util');
-var yargs = require('yargs');
+const path = require('path');
 
-var HttpError = require('../lib/errors/http');
-var InternalError = require('../lib/errors/internal');
-var ValidationError = require('../lib/errors/validation');
+const Corporal = require('corporal');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 
-var RestUtil = require('oae-rest/lib/util');
+const HttpError = require('../lib/errors/http');
+const InternalError = require('../lib/errors/internal');
+const ValidationError = require('../lib/errors/validation');
 
-var argv = yargs
-    .usage('Usage: oaesh [--insecure] [--url <target>] [--username <username>] [-- <command>]')
+const RestUtil = require('oae-rest/lib/util');
 
-    .alias('h', 'help')
-    .describe('h', 'Show this help dialog')
+const R = require('ramda');
+const { not, isEmpty, compose } = R;
+const isNotEmpty = compose(not, isEmpty);
 
-    .alias('i', 'insecure')
-    .describe('i', 'Allow insecure connections to the target environment, such as a QA environment that has a self-signed SSL certificate')
+const yaya = yargs(hideBin(process.argv))
+	.usage('Usage: oaesh [--insecure] [--url <target>] [--username <username>] [-- <command>]')
+	.alias('h', 'help')
+	.describe('h', 'Show this help dialog')
+	.alias('i', 'insecure')
+	.describe(
+		'i',
+		'Allow insecure connections to the target environment, such as a QA environment that has a self-signed SSL certificate'
+	)
+	.alias('U', 'url')
+	.describe('U', 'The target URL to use (e.g., https://guest.oae.com)')
+	.alias('u', 'username')
+	.describe('u', 'The username to use to authenticate. If this is specified, -U must be specified as well')
+	.alias('p', 'password')
+	.describe(
+		'p',
+		'The password to use to authenticate. If -u is specified without this parameter, a password prompt is used'
+	);
 
-    .alias('U', 'url')
-    .describe('U', 'The target URL to use (e.g., https://my.oae.com)')
-
-    .alias('u', 'username')
-    .describe('u', 'The username to use to authenticate. If this is specified, -U must be specified as well')
-
-    .alias('p', 'password')
-    .describe('p', 'The password to use to authenticate. If -u is specified without this parameter, a password prompt is used')
-
-    .argv;
+const { argv } = yaya;
 
 if (argv.h) {
-    yargs.showHelp();
-    process.exit(0);
+	yargs.showHelp();
+	process.exit(0);
 } else if (argv.u && !argv.U) {
-    console.error('If a username is specified, a target URL must be specified as well');
-    console.error();
-    yargs.showHelp();
-    process.exit(1);
+	console.error('If a username is specified, a target URL must be specified as well');
+	console.error();
+	yargs.showHelp();
+	process.exit(1);
 }
 
-var _initialized = false;
+let _initialized = false;
 
 // /dev/null the error event, we handle them individually in the commands
-RestUtil.on('error', function(err) {});
+RestUtil.on('error', function (/* err */) {});
 
-// Add some underscore mixins that make life easier
-require('../lib/internal/underscoreMixins');
-
-////////////////////
-// INITIALIZATION //
-////////////////////
-
-var corporal = new Corporal({
-    'commands': path.join(__dirname, '../lib/commands'),
-    'commandContexts': {
-        '*': {
-            'commands': ['use']
-        },
-        'global-anon': {
-            'commands': [
-                'config-get',
-                'exec',
-                'login',
-                'me'
-            ]
-        },
-        'global-admin': {
-            'commands': [
-                'config-clear',
-                'config-get',
-                'config-set',
-                'exec',
-                'login-as-user',
-                'login-to-tenant',
-                'logout',
-                'me',
-                'previews-reprocess',
-                'search-reindex-all'
-            ]
-        },
-        'user-anon': {
-            'commands': [
-                'config-get',
-                'content-get-members',
-                'exec',
-                'login',
-                'me',
-                'user-create'
-            ]
-        },
-        'user-admin': {
-            'commands': [
-                'config-clear',
-                'config-get',
-                'config-set',
-                'content-get-members',
-                'exec',
-                'login-as-user',
-                'logout',
-                'me',
-                'user-create'
-            ]
-        },
-        'user-user': {
-            'commands': [
-                'config-get',
-                'content-get-members',
-                'exec',
-                'logout',
-                'me'
-            ]
-        }
-    },
-    'env': {
-        'ps1': 'oaesh$ '.bold,
-        'ps2': '> ',
-        'corporal_command_settings': {
-            'help': {
-                'hide': ['clear', 'help', 'quit']
-            }
-        },
-        'insecure': (argv.i)
-    }
+/**
+ * Initialization
+ */
+const corporal = new Corporal({
+	commands: path.join(__dirname, '../lib/commands'),
+	commandContexts: {
+		'*': {
+			commands: ['use']
+		},
+		'global-anon': {
+			commands: ['config-get', 'exec', 'login', 'me']
+		},
+		'global-admin': {
+			commands: [
+				'config-clear',
+				'config-get',
+				'config-set',
+				'exec',
+				'login-as-user',
+				'login-to-tenant',
+				'logout',
+				'me',
+				'user-create',
+				'admin-create',
+				'previews-reprocess',
+				'search-reindex-all'
+			]
+		},
+		'user-anon': {
+			commands: ['config-get', 'content-get-members', 'exec', 'login', 'me', 'user-create']
+		},
+		'user-admin': {
+			commands: [
+				'config-clear',
+				'config-get',
+				'config-set',
+				'content-get-members',
+				'exec',
+				'login-as-user',
+				'logout',
+				'me',
+				'user-create',
+				'admin-create'
+			]
+		},
+		'user-user': {
+			commands: ['config-get', 'content-get-members', 'exec', 'logout', 'me']
+		}
+	},
+	env: {
+		ps1: 'oaesh$ '.bold,
+		ps2: '> ',
+		corporal_command_settings: {
+			help: {
+				hide: ['clear', 'help', 'quit']
+			}
+		},
+		insecure: argv.i
+	}
 });
 
+/**
+ * Error handling
+ */
+corporal.onCommandError(ValidationError, function (err, session, next) {
+	console.error('Validation Error ('.red + err.argumentName.white + '): '.red + err.message.white);
+	if (err.help) {
+		// TODO log here something
+	}
 
+	if (!_initialized) {
+		process.exit(1);
+	}
 
-////////////////////
-// ERROR HANDLING //
-////////////////////
-
-corporal.onCommandError(ValidationError, function(err, session, next) {
-    console.error('Validation Error ('.red + err.argumentName.white + '): '.red + err.message.white);
-    if (err.help) {
-        console.error('');
-        console.error(err.help);
-    }
-
-    if (!_initialized) {
-        process.exit(1);
-    }
-
-    return next();
+	return next();
 });
 
-corporal.onCommandError(HttpError, function(err, session, next) {
-    console.error(util.format('HTTP Error (%s): '.red, err.code) + err.message);
+corporal.onCommandError(HttpError, function (err, session, next) {
+	console.error(`HTTP Error (${err.message}): `.red, err.code);
 
-    if (!_initialized) {
-        process.exit(1);
-    }
+	if (!_initialized) {
+		process.exit(1);
+	}
 
-    return next();
+	return next();
 });
 
-corporal.onCommandError(InternalError, function(err, session, next) {
-    console.error(err.label.red + ': '.red + err.message.white);
+corporal.onCommandError(InternalError, function (err, session, next) {
+	console.error(err.label.red + ': '.red + err.message.white);
 
-    if (!_initialized) {
-        process.exit(1);
-    }
+	if (!_initialized) {
+		process.exit(1);
+	}
 
-    return next();
+	return next();
 });
 
-corporal.onCommandError(Error, function(err, session, next) {
-    console.error('An unexpected error occurred while processing this command.'.red);
-    console.error(err.stack.white);
+corporal.onCommandError(Error, function (err, session, next) {
+	console.error('An unexpected error occurred while processing this command.'.red);
+	console.error(err.stack.white);
 
-    if (!_initialized) {
-        process.exit(1);
-    }
+	if (!_initialized) {
+		process.exit(1);
+	}
 
-    return next();
+	return next();
 });
 
+/**
+ * Execution
+ */
+corporal.on('load', () => {
+	_initialize(() => {
+		_initialized = true;
 
+		// If the user specified the [-- <command>] option, simply invoke the command and quit
+		if (isNotEmpty(argv._)) {
+			const args = argv._.slice();
+			const commandName = args.shift();
+			return corporal.exec(commandName, args);
+		}
 
-///////////////
-// EXECUTION //
-///////////////
-
-corporal.on('load', function() {
-    _initialize(function() {
-        _initialized = true;
-
-        // If the user specified the [-- <command>] option, simply invoke the command
-        // and quit
-        if (!_.isEmpty(argv._)) {
-            var args = argv._.slice();
-            var commandName = args.shift();
-            return corporal.exec(commandName, args);
-        }
-
-        // The user did not specify a command, so they're just starting a session. Start
-        // a command loop
-        corporal.loop();
-    });
+		// The user did not specify a command, so they're just starting a session. Start a command loop
+		corporal.loop();
+	});
 });
 
-
-
-////////////////////////
-// INTERNAL FUNCTIONS //
-////////////////////////
-
+/**
+ * Internal functions
+ */
 function _initialize(callback) {
-    if (!argv.U) {
-        return callback();
-    }
+	if (not(argv.U)) {
+		return callback();
+	}
 
-    corporal.exec('use', [argv.U], function() {
-        if (!argv.u) {
-            return callback();
-        }
+	corporal.exec('use', [argv.U], () => {
+		if (not(argv.u)) {
+			return callback();
+		}
 
-        var loginArgs = ['--username', argv.u];
-        if (argv.p) {
-            loginArgs.push('--password', argv.p);
-        }
+		const loginArgs = ['--username', argv.u];
+		if (argv.p) {
+			loginArgs.push('--password', argv.p);
+		}
 
-        return corporal.exec('login', loginArgs, callback);
-    });
+		return corporal.exec('login', loginArgs, callback);
+	});
 }

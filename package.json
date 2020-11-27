@@ -1,37 +1,69 @@
 {
-  "name": "oaesh",
-  "description": "An interactive shell UI for the Apereo OAE backend (Hilary)",
-  "version": "0.2.1",
-  "homepage": "https://github.com/mrvisser/oaesh",
-  "author": {
-    "name": "Branden Visser",
-    "email": "mrvisser@gmail.com"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mrvisser/oaesh.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mrvisser/oaesh/issues"
-  },
-  "bin": {
-    "oaesh": "./bin/oaesh.js"
-  },
-  "dependencies": {
-    "colors": "latest",
-    "corporal": "latest",
-    "oae-rest": "latest",
-    "read": "latest",
-    "sprintf-js": "latest",
-    "underscore": "latest",
-    "yargs": "1.0.15"
-  },
-  "devDependencies": {
-    "grunt": "latest",
-    "grunt-release": "~0.7.0"
-  },
-  "engines": {
-    "node": ">=0.8"
-  }
+	"name": "oaesh",
+	"description": "An interactive shell UI for the Apereo OAE backend (Hilary)",
+	"version": "0.2.2",
+	"homepage": "https://github.com/oaeproject/oaesh",
+	"author": {
+		"name": "Apereo Foundation",
+		"email": "oae@apereo.org"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/oaeproject/oaesh.git"
+	},
+	"bugs": {
+		"url": "https://github.com/oaeproject/oaesh/issues"
+	},
+	"bin": {
+		"oaesh": "bin/oaesh.js"
+	},
+	"dependencies": {
+		"colors": "latest",
+		"corporal": "latest",
+		"esm": "latest",
+		"oae-rest": "latest",
+		"ramda": "latest",
+		"read": "latest",
+		"sprintf-js": "latest",
+		"underscore": "latest",
+		"yargs": "^16.1.1"
+	},
+	"devDependencies": {
+		"prettier": "latest",
+		"xo": "^0.35.0"
+	},
+	"scripts": {
+		"lint": "node_modules/.bin/xo --prettier --quiet 'lib/**/*.js'",
+		"format": "node_modules/.bin/xo --fix --prettier --quiet 'lib/**/*.js'"
+	},
+	"license": "ECL-2.0",
+	"xo": {
+		"prettier": true,
+		"extends": [
+			"prettier"
+		],
+		"plugins": [
+			"prettier"
+		],
+		"ignores": [],
+		"rules": {
+			"node/prefer-promises/fs": "off",
+			"import/no-extraneous-dependencies": "off",
+			"promise/prefer-await-to-then": "off",
+			"capitalized-comments": "off",
+			"max-params": "off",
+			"max-nested-callbacks": "off",
+			"prettier/prettier": "error",
+			"no-use-before-define": "off",
+			"no-warning-comments": "off",
+			"prefer-named-capture-group": "off",
+			"import/no-unresolved": "off"
+		},
+		"env": [
+			"mocha"
+		]
+	},
+	"engines": {
+		"node": ">=15.0.0"
+	}
 }
